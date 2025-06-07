@@ -35,8 +35,8 @@ func main() {
 	}
 
 	// add hourly fresh bot data
-	s.NewJob(gocron.CronJob("0 0 * * *", false), gocron.NewTask(func() {
-		utils.Logger.Debug("Running Daily Job - Bot Stats")
+	s.NewJob(gocron.CronJob("*/5 * * * *", false), gocron.NewTask(func() {
+		utils.Logger.Debug("Running Job - Bot Stats")
 		tasks.UpdateBotStats()
 	}))
 
