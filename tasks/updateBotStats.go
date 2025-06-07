@@ -35,6 +35,7 @@ func UpdateBotStats() {
 	if config.Conf.Auth.BotListMe != "" {
 		postStats(ctx, fmt.Sprintf("https://api.botlist.me/api/v1/bots/%s/stats", config.Conf.ClientId), config.Conf.Auth.BotListMe, map[string]int{
 			"server_count": count,
+			// "shard_count": 0
 		})
 	}
 
