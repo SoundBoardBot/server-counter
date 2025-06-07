@@ -20,27 +20,38 @@ func UpdateBotStats() {
 		return
 	}
 
-	PostTopGG(context.Background(), config.Conf.ClientId, config.Conf.Auth.TopGG, count)
-	PostDiscordBotList(context.Background(), config.Conf.ClientId, config.Conf.Auth.DiscordBotList, count)
+	ctx := context.Background()
+	if config.Conf.Auth.TopGG != "" {
+		postStats(ctx, fmt.Sprintf("https://top.gg/api/bots/%s/stats", config.Conf.ClientId), config.Conf.Auth.TopGG, map[string]int{
+			"server_count": count,
+		})
+	}
+	if config.Conf.Auth.DiscordBotList != "" {
+		postStats(ctx, fmt.Sprintf("https://discordbotlist.com/api/v1/bots/%s/stats", config.Conf.ClientId), config.Conf.Auth.DiscordBotList, map[string]int{
+			"guilds": count,
+			// "users":  users,
+		})
+	}
+	if config.Conf.Auth.BotListMe != "" {
+		postStats(ctx, fmt.Sprintf("https://api.botlist.me/api/v1/bots/%s/stats", config.Conf.ClientId), config.Conf.Auth.BotListMe, map[string]int{
+			"server_count": count,
+		})
+	}
 
 	utils.Logger.Sugar().Infof("Guild Count Updated to %d", count)
 }
 
-func PostTopGG(ctx context.Context, botID string, token string, serverCount int) error {
-	endpoint := fmt.Sprintf("https://top.gg/api/bots/%s/stats", botID)
-
-	payload := map[string]int{
-		"server_count": serverCount,
-	}
-
+func postStats(ctx context.Context, url, token string, payload map[string]int) {
 	body, err := json.Marshal(payload)
 	if err != nil {
-		return fmt.Errorf("failed to marshal payload: %w", err)
+		utils.Logger.Sugar().Errorf("Failed to marshal payload: %v", err)
+		return
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewBuffer(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(body))
 	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
+		utils.Logger.Sugar().Errorf("Failed to create request: %v", err)
+		return
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -50,49 +61,12 @@ func PostTopGG(ctx context.Context, botID string, token string, serverCount int)
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("request failed: %w", err)
+		utils.Logger.Sugar().Errorf("Request to %s failed: %v", url, err)
+		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= 300 {
-		return fmt.Errorf("bad status posting to Top.gg: %s", resp.Status)
+		utils.Logger.Sugar().Errorf("Bad response from %s: %s", url, resp.Status)
 	}
-
-	return nil
-}
-
-func PostDiscordBotList(ctx context.Context, botSlug string, token string, guilds int /*, users int*/) error {
-	endpoint := fmt.Sprintf("https://discordbotlist.com/api/v1/bots/%s/stats", botSlug)
-
-	payload := map[string]int{
-		"guilds": guilds,
-		// "users":  users,
-	}
-
-	body, err := json.Marshal(payload)
-	if err != nil {
-		return fmt.Errorf("failed to marshal payload: %w", err)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewBuffer(body))
-	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", "SoundBoardBot/1.0 (+https://github.com/SoundBoardBot/server-counter)")
-	req.Header.Set("Authorization", token)
-
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode >= 300 {
-		return fmt.Errorf("bad status posting to DBL: %s", resp.Status)
-	}
-
-	return nil
 }

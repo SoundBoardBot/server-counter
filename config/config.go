@@ -16,8 +16,9 @@ type Config struct {
 	ClientId string `env:"BOT_ID" envDefault:"668946506836869150"`
 
 	Auth struct {
-		TopGG          string `env:"TOPGG"`
-		DiscordBotList string `env:"DISCORDBOTLIST"`
+		TopGG          string `env:"TOPGG" envDefault:""`
+		DiscordBotList string `env:"DISCORDBOTLIST" envDefault:""`
+		BotListMe      string `env:"BOTLISTME" envDefault:""`
 	} `envPrefix:"AUTH_"`
 
 	DatabaseUrl string `env:"DATABASE_URL,required"`
