@@ -28,6 +28,10 @@ func main() {
 		panic(fmt.Errorf("failed to create cron scheduler: %w", s_err))
 	}
 
+	utils.Logger.Sugar().Infof("top.gg Enabled: %s", IsEnabled(config.Conf.Auth.TopGG))
+	utils.Logger.Sugar().Infof("discordbotlist.com Enabled: %s", IsEnabled(config.Conf.Auth.DiscordBotList))
+	utils.Logger.Sugar().Infof("botlist.me Enabled: %s", IsEnabled(config.Conf.Auth.BotListMe))
+
 	if config.Conf.OneShot {
 		utils.Logger.Info("Running Job - Bot Stats")
 		tasks.UpdateBotStats()
@@ -50,4 +54,11 @@ func main() {
 	<-shutdownCh
 
 	utils.Logger.Info("Received shutdown signal")
+}
+
+func IsEnabled(value string) string {
+	if value == "" {
+		return "No"
+	}
+	return "Yes"
 }
