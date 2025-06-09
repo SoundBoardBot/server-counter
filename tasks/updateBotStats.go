@@ -38,6 +38,12 @@ func UpdateBotStats() {
 			// "shard_count": 0
 		})
 	}
+	if config.Conf.Auth.VoidBots != "" {
+		postStats(ctx, fmt.Sprintf("https://api.voidbots.net/bot/stats/%s", config.Conf.ClientId), config.Conf.Auth.VoidBots, map[string]int{
+			"server_count": count,
+			// "shard_count": 0
+		})
+	}
 
 	utils.Logger.Sugar().Infof("Guild Count Updated to %d", count)
 }

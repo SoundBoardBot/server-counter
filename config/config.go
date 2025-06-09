@@ -19,6 +19,7 @@ type Config struct {
 		TopGG          string `env:"TOPGG" envDefault:""`
 		DiscordBotList string `env:"DISCORDBOTLIST" envDefault:""`
 		BotListMe      string `env:"BOTLISTME" envDefault:""`
+		VoidBots       string `env:"VOIDBOTS" envDefault:""`
 	} `envPrefix:"AUTH_"`
 
 	DatabaseUrl string `env:"DATABASE_URL,required"`

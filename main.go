@@ -31,6 +31,7 @@ func main() {
 	utils.Logger.Sugar().Infof("top.gg Enabled: %s", IsEnabled(config.Conf.Auth.TopGG))
 	utils.Logger.Sugar().Infof("discordbotlist.com Enabled: %s", IsEnabled(config.Conf.Auth.DiscordBotList))
 	utils.Logger.Sugar().Infof("botlist.me Enabled: %s", IsEnabled(config.Conf.Auth.BotListMe))
+	utils.Logger.Sugar().Infof("voidbots.net Enabled: %s", IsEnabled(config.Conf.Auth.VoidBots))
 
 	if config.Conf.OneShot {
 		utils.Logger.Info("Running Job - Bot Stats")
