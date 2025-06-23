@@ -13,12 +13,18 @@ import (
 	"github.com/SoundBoardBot/server-counter/utils"
 )
 
+var last_count = 0
+
 func UpdateBotStats() {
 	count, err := db.GetGuildCount(context.Background())
 	if err != nil {
 		utils.Logger.Sugar().Errorf("An error while fetching server count: %w", err)
 		return
 	}
+	if count == last_count {
+		return
+	}
+	last_count = count
 
 	ctx := context.Background()
 	if config.Conf.Auth.TopGG != "" {
