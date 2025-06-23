@@ -13,45 +13,52 @@ import (
 	"github.com/SoundBoardBot/server-counter/utils"
 )
 
-var last_count = 0
+var last_guild_count = 0
+var last_member_count = 0
 
 func UpdateBotStats() {
-	count, err := db.GetGuildCount(context.Background())
+	guild_count, err := db.GetGuildCount(context.Background())
 	if err != nil {
 		utils.Logger.Sugar().Errorf("An error while fetching server count: %w", err)
 		return
 	}
-	if count == last_count {
+	member_count, err := db.GetMemberCount(context.Background())
+	if err != nil {
+		utils.Logger.Sugar().Errorf("An error while fetching member count: %w", err)
 		return
 	}
-	last_count = count
+	if guild_count == last_guild_count && member_count == last_member_count {
+		return
+	}
+	last_guild_count = guild_count
+	last_member_count = member_count
 
 	ctx := context.Background()
 	if config.Conf.Auth.TopGG != "" {
 		postStats(ctx, fmt.Sprintf("https://top.gg/api/bots/%s/stats", config.Conf.ClientId), config.Conf.Auth.TopGG, map[string]int{
-			"server_count": count,
+			"server_count": guild_count,
 		})
 	}
 	if config.Conf.Auth.DiscordBotList != "" {
 		postStats(ctx, fmt.Sprintf("https://discordbotlist.com/api/v1/bots/%s/stats", config.Conf.ClientId), config.Conf.Auth.DiscordBotList, map[string]int{
-			"guilds": count,
-			// "users":  users,
+			"guilds": guild_count,
+			"users":  member_count,
 		})
 	}
 	if config.Conf.Auth.BotListMe != "" {
 		postStats(ctx, fmt.Sprintf("https://api.botlist.me/api/v1/bots/%s/stats", config.Conf.ClientId), config.Conf.Auth.BotListMe, map[string]int{
-			"server_count": count,
+			"server_count": guild_count,
 			// "shard_count": 0
 		})
 	}
 	if config.Conf.Auth.VoidBots != "" {
 		postStats(ctx, fmt.Sprintf("https://api.voidbots.net/bot/stats/%s", config.Conf.ClientId), config.Conf.Auth.VoidBots, map[string]int{
-			"server_count": count,
+			"server_count": guild_count,
 			// "shard_count": 0
 		})
 	}
 
-	utils.Logger.Sugar().Infof("Guild Count Updated to %d", count)
+	utils.Logger.Sugar().Infof("Guild Count Updated to %d, Member Count Updated to %d", guild_count, member_count)
 }
 
 func postStats(ctx context.Context, url, token string, payload map[string]int) {
