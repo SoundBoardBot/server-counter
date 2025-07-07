@@ -22,6 +22,11 @@ type Config struct {
 		VoidBots       string `env:"VOIDBOTS" envDefault:""`
 	} `envPrefix:"AUTH_"`
 
+	Http struct {
+		Enabled bool   `env:"ENABLED" envDefault:"true"`
+		Address string `env:"ADDRESS" envDefault:":8000"`
+	} `envPrefix:"HTTP_"`
+
 	DatabaseUrl string `env:"DATABASE_URL,required"`
 }
 

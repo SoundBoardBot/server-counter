@@ -8,6 +8,7 @@ import (
 
 	"github.com/SoundBoardBot/server-counter/config"
 	"github.com/SoundBoardBot/server-counter/db"
+	"github.com/SoundBoardBot/server-counter/http"
 	"github.com/SoundBoardBot/server-counter/tasks"
 	"github.com/SoundBoardBot/server-counter/utils"
 
@@ -48,6 +49,14 @@ func main() {
 	// start the scheduler
 	utils.Logger.Info("Starting cron jobs")
 	s.Start()
+
+	// Start HTTP server...
+	if config.Conf.Http.Enabled {
+		utils.Logger.Info("Starting HTTP server...")
+		server := http.NewServer(utils.Logger, config.Conf)
+		server.RegisterRoutes()
+		server.Start()
+	}
 
 	// keep alive until shutdown signal
 	shutdownCh := make(chan os.Signal, 1)

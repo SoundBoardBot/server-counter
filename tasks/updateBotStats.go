@@ -13,8 +13,8 @@ import (
 	"github.com/SoundBoardBot/server-counter/utils"
 )
 
-var last_guild_count = 0
-var last_member_count = 0
+var Last_guild_count = 0
+var Last_member_count = 0
 
 func UpdateBotStats() {
 	guild_count, err := db.GetGuildCount(context.Background())
@@ -27,11 +27,11 @@ func UpdateBotStats() {
 		utils.Logger.Sugar().Errorf("An error while fetching member count: %w", err)
 		return
 	}
-	if guild_count == last_guild_count && member_count == last_member_count {
+	if guild_count == Last_guild_count && member_count == Last_member_count {
 		return
 	}
-	last_guild_count = guild_count
-	last_member_count = member_count
+	Last_guild_count = guild_count
+	Last_member_count = member_count
 
 	ctx := context.Background()
 	if config.Conf.Auth.TopGG != "" {
